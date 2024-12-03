@@ -20,6 +20,7 @@
                 </select>
             </div>
             {{/if}}
+            {{#if ages.length}}
             <div class="col-3 col-md-2 pe-0">
                 <select id="age-filter" class="form-control">
                     <option value="none" selected>Độ Tuổi</option>
@@ -28,7 +29,8 @@
                     {{/each}}
                 </select>
             </div>
-
+            {{/if}}
+            {{#if countries.length}}
             <div class="col-3 col-md-2 pe-0">
                 <select id="country-filter" class="form-control">
                     <option value="none" selected>Quốc Gia</option>
@@ -37,6 +39,7 @@
                     {{/each}}
                 </select>
             </div>
+            {{/if}}
             <div class="col-3 col-md-2">
                 <select id="rating-filter" class="form-control">
                     <option value="none" selected>Đánh Giá</option>
@@ -51,7 +54,7 @@
         </div>
 
         <div class="row gx-3 gx-sm-4 gy-3 gy-sm-4" id="movie-list">
-            {{#if movies}}
+            {{#if movies.length}}
             {{#each movies}}
             <div class="col-6 col-sm-6 col-xl-3 movie-item" data-genre="{{this.genre}}" data-age="{{this.limitage_vn}}"
                 data-rating="{{this.ratings}}" data-country="{{this.type_name_vn}}">
@@ -89,29 +92,81 @@
             </div>
             {{/if}}
         </div>
+
+        <!-- Pagination controls -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {{#if (gt currentPage 1)}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{subtract currentPage 1}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {{/if}}
+                {{#each (range 1 totalPages)}}
+                <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+                    <a class="page-link" href="?page={{this}}">{{this}}</a>
+                </li>
+                {{/each}}
+                {{#if (lt currentPage totalPages)}}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{add currentPage 1}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {{/if}}
+            </ul>
+        </nav>
     </div>
 </section>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load saved filter values from localStorage
+        const savedGenre = localStorage.getItem('genre-filter');
+        const savedAge = localStorage.getItem('age-filter');
+        const savedRating = localStorage.getItem('rating-filter');
+        const savedCountry = localStorage.getItem('country-filter');
+
+        if (savedGenre) {
+            document.getElementById('genre-filter').value = savedGenre;
+        }
+        if (savedAge) {
+            document.getElementById('age-filter').value = savedAge;
+        }
+        if (savedRating) {
+            document.getElementById('rating-filter').value = savedRating;
+        }
+        if (savedCountry) {
+            document.getElementById('country-filter').value = savedCountry;
+        }
+    });
+
     document.getElementById('filter-button').addEventListener('click', function () {
         // Get values from the form elements
-        const genre = document.getElementById('genre-filter')?.value;
-        const age = document.getElementById('age-filter').value;
-        const rating = document.getElementById('rating-filter').value;
-        const country = document.getElementById('country-filter').value;
+        const genre = document.getElementById('genre-filter')?.value || 'none';
+        const age = document.getElementById('age-filter').value || 'none';
+        const rating = document.getElementById('rating-filter').value || 'none';
+        const country = document.getElementById('country-filter').value || 'none';
         const queryParams = new URLSearchParams();
 
+        // Save filter values to localStorage
+        localStorage.setItem('genre-filter', genre);
+        localStorage.setItem('age-filter', age);
+        localStorage.setItem('rating-filter', rating);
+        localStorage.setItem('country-filter', country);
+
         // Append filter values to queryParams if not 'none'
-        if (genre && genre !== 'none') {
+        if (genre !== 'none') {
             queryParams.append('genre', genre);
         }
-        if (age && age !== 'none') {
+        if (age !== 'none') {
             queryParams.append('age', age);
         }
-        if (country && country !== 'none') {
+        if (country !== 'none') {
             queryParams.append('country', country);
         }
-        if (rating && rating !== 'none') {
+        if (rating !== 'none') {
             queryParams.append('rating', rating);
         }
 
