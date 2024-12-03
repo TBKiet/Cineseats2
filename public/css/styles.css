@@ -189,6 +189,7 @@ ul {
 .cta-text {
     padding-left: 0;
     display: inline-block;
+    color: #fff;
 }
 
 .cta-text h4 {
@@ -201,6 +202,12 @@ ul {
 .cta-text span {
     color: #757575;
     font-size: 15px;
+}
+
+.cta-text a {
+    color: #fff;
+    font-size: 15px;
+    text-decoration: none;
 }
 
 .footer-content {
@@ -530,6 +537,7 @@ ul {
     width: 90%;
     max-width: 1100px;
     margin: auto;
+    display: grid;
     align-items: center;
     align-content: center;
 }

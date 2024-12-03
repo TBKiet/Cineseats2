@@ -2,7 +2,8 @@ const {getMovieListsByType, getMovieById} = require("./movies.service");
 
 const renderMovieListByType = async (req, res, movieType) => {
     try {
-        const movieData = await getMovieListsByType(movieType);
+        const page = parseInt(req.query.page) || 1;
+        const movieData = await getMovieListsByType(movieType, page);
         res.render("movie-list", {
             layout: "main", ...movieData
         });
@@ -11,6 +12,7 @@ const renderMovieListByType = async (req, res, movieType) => {
         res.status(500).send("Error loading movies.");
     }
 };
+
 exports.renderMovieList = async (req, res) =>
     renderMovieListByType(req, res, "all");
 

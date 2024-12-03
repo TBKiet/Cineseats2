@@ -1,6 +1,6 @@
 const Movie = require("./movies.model");
 
-async function getMovieListsByType(movieType) {
+async function getMovieListsByType(movieType, page = 1, limit = 8) {
     const today = new Date();
     let filter = {};
     const movieStates = { all: "inactive-film", showing: "inactive-film", upcoming: "inactive-film" };
@@ -16,7 +16,13 @@ async function getMovieListsByType(movieType) {
     }
 
     try {
-        const movies = await Movie.find(filter).lean();
+        const movies = await Movie.find(filter)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+        const totalMovies = await Movie.countDocuments(filter);
+        const totalPages = Math.ceil(totalMovies / limit);
+
         const extractUnique = (key) => [...new Set(movies.flatMap((movie) => movie[key]))].sort();
         return {
             movies,
@@ -24,11 +30,13 @@ async function getMovieListsByType(movieType) {
             ages: extractUnique("limitage_vn"),
             ratings: extractUnique("ratings"),
             countries: extractUnique("country_name_vn"),
+            totalPages,
+            currentPage: page,
             ...movieStates, // Ensure movieStates are included in the returned object
         };
     } catch (err) {
         console.error("Error fetching movies:", err);
-        return { movies: [], genres: [], ages: [], ratings: [], countries: [], ...movieStates };
+        return { movies: [], genres: [], ages: [], ratings: [], countries: [], totalPages: 0, currentPage: page, ...movieStates };
     }
 }
 

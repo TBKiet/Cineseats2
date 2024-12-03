@@ -51,8 +51,23 @@ app.engine(
         extname: ".hbs",
         layoutsDir: path.join(__dirname, "views", "layouts"),
         partialsDir: path.join(__dirname, "views", "partials"),
+        helpers: {
+            add: (a, b) => a + b,
+            subtract: (a, b) => a - b,
+            eq: (a, b) => a === b,
+            gt: (a, b) => a > b,
+            lt: (a, b) => a < b,
+            range: (start, end) => {
+                const range = [];
+                for (let i = start; i <= end; i++) {
+                    range.push(i);
+                }
+                return range;
+            },
+        },
     })
 );
+
 app.set("view engine", "hbs");
 
 // Middleware to pass user information to views

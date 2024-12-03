@@ -18,11 +18,11 @@ const renderMovieListByType = async (req, res, movieType) => {
   }
 };
 exports.renderMovieList = async (req, res) => {
-  renderMovieListByType(req, res, "all");
+  await renderMovieListByType(req, res, "all");
 };
 exports.renderShowingMovieList = async (req, res) => {
-  renderMovieListByType(req, res, "showing");
+  await renderMovieListByType(req, res, "showing");
 };
 exports.renderUpcomingMovieList = async (req, res) => {
-  renderMovieListByType(req, res, "upcoming");
+  await renderMovieListByType(req, res, "upcoming");
 };
