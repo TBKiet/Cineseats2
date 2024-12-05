@@ -7,6 +7,7 @@ const renderMovieListByType = async (req, res, movieType) => {
         res.render("movie-list", {
             layout: "main", ...movieData
         });
+
     } catch (error) {
         console.error("Error loading movies:", error);
         res.status(500).send("Error loading movies.");

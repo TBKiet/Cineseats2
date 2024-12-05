@@ -12,7 +12,7 @@ const searchRouter = require("./components/search/search.routes");
 const homeRouter = require("./components/home/routes");
 const userRouter = require("./components/auth/auth.routes");
 const profileRouter = require("./components/profile/profile.routes");
-
+const apiRouter = require("./components/api/api.routes");
 
 const app = express();
 const PORT = 3000;
@@ -81,7 +81,7 @@ app.use("/", homeRouter);
 app.use("/movies", movieRouter);
 app.use("/search", searchRouter);
 app.use("/profile", profileRouter);
-
+app.use("/api", apiRouter);
 app.get("/about", (req, res) => {
     res.render("about", {layout: "main"});
 });

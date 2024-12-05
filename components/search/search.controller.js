@@ -6,7 +6,10 @@ const renderFilteredMovieListByType = async (req, res, movieType) => {
         const query = getQueryFromReq(req);
         const page = getPageFromReq(req);
         const filteredMovies = await getMovieListsByType(movieType, page, 8, query);
-        res.send(filteredMovies);
+        res.render("movie-list", {
+            layout: "main",
+            ...filteredMovies,
+        });
     } catch (error) {
         console.error("Error loading movies:", error);
         res.status(500).send("Error loading movies.");
