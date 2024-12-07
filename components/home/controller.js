@@ -1,11 +1,10 @@
 // controller.js
-const {promotions} = require("./service");
-const {getMovieListsByType} = require("../../utility/movie");
+const {promotions, MovieService} = require("./service");
 const renderMovieList = async (req, res) => {
     try {
 
-        const showingMovieList = (await getMovieListsByType("showing", undefined, Infinity)).movies;
-        const upcomingMovieList = (await getMovieListsByType("upcoming", undefined, Infinity)).movies;
+        const showingMovieList = (await MovieService.getMovieListsByType("showing", undefined, Infinity)).movies;
+        const upcomingMovieList = (await MovieService.getMovieListsByType("upcoming", undefined, Infinity)).movies;
         res.render("home", {
             layout: "main",
             showingMovies: showingMovieList,

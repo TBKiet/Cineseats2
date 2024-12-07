@@ -1,11 +1,11 @@
-const {getMovieListsByType} = require("../../utility/movie");
+const MovieService = require("./search.service");
 const {getQueryFromReq, getPageFromReq} = require("../../utility/extractRequest");
 
 const renderFilteredMovieListByType = async (req, res, movieType) => {
     try {
         const query = getQueryFromReq(req);
         const page = getPageFromReq(req);
-        const filteredMovies = await getMovieListsByType(movieType, page, 8, query);
+        const filteredMovies = await MovieService.getMovieListsByType(movieType, page, undefined, query);
         res.render("movie-list", {
             layout: "main",
             ...filteredMovies,
