@@ -123,36 +123,19 @@
         const movieList = document.getElementById("movie-list");
         const pagination = document.getElementById("pagination");
         const filterButton = document.getElementById("filter-button");
-
-        // Get current URL query parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        // Pre-select values from the URL
-        const genre = urlParams.get('genre') || 'none';
-        const age = urlParams.get('age') || 'none';
-        const rating = urlParams.get('rating') || 'none';
-        const country = urlParams.get('country') || 'none';
-        // Set the form fields to match the URL parameters
-        if (genre !== 'none') {
-            document.getElementById('genre-filter').value = genre;
-        }
-        if (age !== 'none') {
-            document.getElementById('age-filter').value = age;
-        }
-        if (rating !== 'none') {
-            document.getElementById('rating-filter').value = rating;
-        }
-        if (country !== 'none') {
-            document.getElementById('country-filter').value = country;
-        }
+        const searchForm = document.getElementById("search-form");
+        const searchField = document.getElementById("search-field");
 
         // Fetch movies based on filters and page
-        const fetchMovies = async (page = 1) => {
+        const fetchMovies = async (page = 1, keyword) => {
             const genre = document.getElementById('genre-filter')?.value || 'none';
             const age = document.getElementById('age-filter').value || 'none';
             const rating = document.getElementById('rating-filter').value || 'none';
             const country = document.getElementById('country-filter').value || 'none';
 
             const queryParams = new URLSearchParams();
+            if (keyword)
+                queryParams.append('keyword', keyword);
             queryParams.append('page', page);
             if (genre !== 'none') queryParams.append('genre', genre);
             if (age !== 'none') queryParams.append('age', age);
@@ -163,10 +146,13 @@
             let response;
             if (url.includes("showing")) {
                 response = await fetch(`/api/movies/showing?${queryParams}`);
+                window.history.replaceState({}, '', `/search/showing?${queryParams}`);
             } else if (url.includes("upcoming")) {
                 response = await fetch(`/api/movies/upcoming?${queryParams}`);
+                window.history.replaceState({}, '', `/search/upcoming?${queryParams}`);
             } else {
                 response = await fetch(`/api/movies?${queryParams}`);
+                window.history.replaceState({}, '', `/search?${queryParams}`);
             }
             const data = await response.json();
             // renderNavFilm(data.all, data.showing, data.upcoming);
@@ -174,6 +160,8 @@
             renderPagination(data.currentPage, data.totalPages);
             await renderMovies(data.movies);
             window.scrollTo({top: 0, behavior: 'smooth'});
+
+
         };
 
         // Render movies dynamically
@@ -254,51 +242,82 @@
                 }
             }
         });
-        // filterButton.addEventListener("click", () => fetchMovies());
-        filterButton.addEventListener('click', function () {
-            // Get values from the form elements
-            const genre = document.getElementById('genre-filter')?.value || 'none';
-            const age = document.getElementById('age-filter').value || 'none';
-            const rating = document.getElementById('rating-filter').value || 'none';
-            const country = document.getElementById('country-filter').value || 'none';
-            const queryParams = new URLSearchParams();
 
-            // Append filter values to queryParams if not 'none'
+        filterButton.addEventListener("click", async () => {
+            await fetchMovies();
+            // Get current URL query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            // Pre-select values from the URL
+            const genre = urlParams.get('genre') || 'none';
+            const age = urlParams.get('age') || 'none';
+            const rating = urlParams.get('rating') || 'none';
+            const country = urlParams.get('country') || 'none';
+            // Set the form fields to match the URL parameters
             if (genre !== 'none') {
-                queryParams.append('genre', genre);
+                document.getElementById('genre-filter').value = genre;
             }
             if (age !== 'none') {
-                queryParams.append('age', age);
-            }
-            if (country !== 'none') {
-                queryParams.append('country', country);
+                document.getElementById('age-filter').value = age;
             }
             if (rating !== 'none') {
-                queryParams.append('rating', rating);
+                document.getElementById('rating-filter').value = rating;
             }
-
-            // Get the current path
-            const currentPath = window.location.href;
-            let url = `/search?${queryParams}`;
-
-            // Adjust URL based on the current path (showing, upcoming, etc.)
-            if (currentPath.includes('/showing')) {
-                url = `/search/showing?${queryParams}`;
-            } else if (currentPath.includes('/upcoming')) {
-                url = `/search/upcoming?${queryParams}`;
-            } else if (currentPath.includes('/search?keyword')) {
-                // Handle case where URL already contains search parameters (e.g., search?keyword=value)
-                const currentUrl = new URL(window.location.href);
-                // Combine existing search parameters with new ones
-                const existingParams = new URLSearchParams(currentUrl.search);
-                queryParams.forEach((value, key) => {
-                    existingParams.set(key, value);  // Use set to ensure they are updated
-                });
-                currentUrl.search = existingParams.toString();
-                url = currentUrl.toString(); // Get the updated URL with combined query parameters
+            if (country !== 'none') {
+                document.getElementById('country-filter').value = country;
             }
-            // Use fetch to send the request (optional, for dynamic data handling)
-            window.location.href = url;
         });
+        // Add event listener to search form
+        searchForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const keyword = searchField.value.trim();
+            if (keyword) {
+                fetchMovies(undefined, keyword);
+            }
+        });
+        // filterButton.addEventListener('click', function () {
+        //     // Get values from the form elements
+        //     const genre = document.getElementById('genre-filter')?.value || 'none';
+        //     const age = document.getElementById('age-filter').value || 'none';
+        //     const rating = document.getElementById('rating-filter').value || 'none';
+        //     const country = document.getElementById('country-filter').value || 'none';
+        //     const queryParams = new URLSearchParams();
+        //
+        //     // Append filter values to queryParams if not 'none'
+        //     if (genre !== 'none') {
+        //         queryParams.append('genre', genre);
+        //     }
+        //     if (age !== 'none') {
+        //         queryParams.append('age', age);
+        //     }
+        //     if (country !== 'none') {
+        //         queryParams.append('country', country);
+        //     }
+        //     if (rating !== 'none') {
+        //         queryParams.append('rating', rating);
+        //     }
+        //
+        //     // Get the current path
+        //     const currentPath = window.location.href;
+        //     let url = `/search?${queryParams}`;
+        //
+        //     // Adjust URL based on the current path (showing, upcoming, etc.)
+        //     if (currentPath.includes('/showing')) {
+        //         url = `/search/showing?${queryParams}`;
+        //     } else if (currentPath.includes('/upcoming')) {
+        //         url = `/search/upcoming?${queryParams}`;
+        //     } else if (currentPath.includes('/search?keyword')) {
+        //         // Handle case where URL already contains search parameters (e.g., search?keyword=value)
+        //         const currentUrl = new URL(window.location.href);
+        //         // Combine existing search parameters with new ones
+        //         const existingParams = new URLSearchParams(currentUrl.search);
+        //         queryParams.forEach((value, key) => {
+        //             existingParams.set(key, value);  // Use set to ensure they are updated
+        //         });
+        //         currentUrl.search = existingParams.toString();
+        //         url = currentUrl.toString(); // Get the updated URL with combined query parameters
+        //     }
+        //     // Use fetch to send the request (optional, for dynamic data handling)
+        //     window.location.href = url;
+        // });
     });
 </script>

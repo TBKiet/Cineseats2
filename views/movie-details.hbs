@@ -1,61 +1,63 @@
 <section>
     <div class="container-fluid px-0">
         <!-- Movie Trailer -->
-        <div class="rh5-media-wrapper-16:9">
-            <iframe src="https://www.youtube.com/embed/{{trailer}}" frameborder="0" webkitallowfullscreen
-                mozallowfullscreen allowfullscreen></iframe>
-        </div>
+        {{#if trailer}}
+            <div class="rh5-media-wrapper-16:9">
+                <iframe src="https://www.youtube.com/embed/{{trailer}}" frameborder="0" webkitallowfullscreen
+                        mozallowfullscreen allowfullscreen></iframe>
+            </div>
+        {{/if}}
         {{#if background_image_url}}
         <div class="mv-detail" style="background: url({{background_image_url}}); background-size: cover;">
         {{else}}
         <div class="mv-detail" style="background-size: cover;">
         {{/if}}
-            <div class="popular-movie-slider">
-                <img src="{{image}}" alt="{{name_vn}}" class="poster">
+        <div class="popular-movie-slider">
+            <img src="{{image}}" alt="{{name_vn}}" class="poster">
 
-                <div class="popular-movie-slider-content">
-                    <p class="release">Ngày khởi chiếu: {{release_date}}</p>
-                    <h2 class="movie-name">{{name_vn}}</h2>
-                    <ul class="category">
-                        <li>
-                            <p>Thể loại: {{type_name_vn}}</p>
-                        </li>
-                        <li>
-                            <p>Nhà sản xuất: {{production}}</p>
-                        </li>
-                        <li>
-                            <p>Đạo diễn: {{director}}</p>
-                        </li>
-                        <li>
-                            <p>Diễn viên: {{actor}}</p>
-                        </li>
-                    </ul>
+            <div class="popular-movie-slider-content">
+                <p class="release">Ngày khởi chiếu: {{release_date}}</p>
+                <h2 class="movie-name">{{name_vn}}</h2>
+                <ul class="category">
+                    <li>
+                        <p>Thể loại: {{type_name_vn}}</p>
+                    </li>
+                    <li>
+                        <p>Nhà sản xuất: {{production}}</p>
+                    </li>
+                    <li>
+                        <p>Đạo diễn: {{director}}</p>
+                    </li>
+                    <li>
+                        <p>Diễn viên: {{actor}}</p>
+                    </li>
+                </ul>
 
-                    <p class="desc">{{brief_vn}}</p>
+                <p class="desc">{{brief_vn}}</p>
 
-                    <div class="movie-info">
-                        <p><i class="fa-solid fa-clock"></i> {{time}} phút</p>
-                        {{#if country_name_vn}}
+                <div class="movie-info">
+                    <p><i class="fa-solid fa-clock"></i> {{time}} phút</p>
+                    {{#if country_name_vn}}
                         <p><i class="fa-solid fa-globe"></i> {{country_name_vn}}</p>
-                        {{else}}
+                    {{else}}
                         <p><i class="fa-solid fa-globe"></i> Đang cập nhật</p>
-                        {{/if}}
-                        {{#if ratings}}
+                    {{/if}}
+                    {{#if ratings}}
                         <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> {{ratings}}</p>
-                        {{else}}
+                    {{else}}
                         <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> 0.0</p>
-                        {{/if}}
-                    </div>
-                    <div class="movie-btns">
-                        <button>
-                            <p><i class="fa-solid fa-ticket"></i> Đặt Vé</p>
-                        </button>
-                    </div>
-
+                    {{/if}}
+                </div>
+                <div class="movie-btns">
+                    <button>
+                        <p><i class="fa-solid fa-ticket"></i> Đặt Vé</p>
+                    </button>
                 </div>
 
             </div>
+
         </div>
+    </div>
         <!---slider--->
         <div class="container mb-3">
             <h1 class="showing-line">Related Movies</h1>
@@ -63,25 +65,26 @@
                 <button class="slider-btn prev" onclick="moveSlide('relative', -4)">❮</button>
                 <div class="slider">
                     {{#each relatedMovies}}
-                    <div class="movie-slide col-6 col-sm-6 col-xl-3" id="mv-img">
-                        <div class="brief-des">
-                            <a href="/movies/{{this.id}}">
-                                <img src="{{this.image}}" alt="{{this.name_vn}}" class="img-fluid">
-                            </a>
-                            <div class="rating">
-                                {{#if this.ratings}}
-                                    <i class="fa-solid fa-star"></i>
-                                    <p>{{this.ratings}}</p>
-                                {{/if}}
+                        <div class="movie-slide col-6 col-sm-6 col-xl-3" id="mv-img">
+                            <div class="brief-des">
+                                <a href="/movies/{{this.id}}">
+                                    <img src="{{this.image}}" alt="{{this.name_vn}}" class="img-fluid">
+                                </a>
+                                <div class="rating">
+                                    {{#if this.ratings}}
+                                        <i class="fa-solid fa-star"></i>
+                                        <p>{{this.ratings}}</p>
+                                    {{/if}}
+                                </div>
+                                <div class="age-limit">{{this.limitage_vn}}</div>
                             </div>
-                            <div class="age-limit">{{this.limitage_vn}}</div>
+                            <p class="mv-name">{{this.name_vn}}</p>
                         </div>
-                        <p class="mv-name">{{this.name_vn}}</p>
-                    </div>
                     {{/each}}
                 </div>
                 <button class="slider-btn next" onclick="moveSlide('relative', 4)">❯</button>
             </div>
         </div>
+    </div>
     </div>
 </section>
