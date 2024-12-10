@@ -142,18 +142,10 @@
             if (country !== 'none') queryParams.append('country', country);
             if (rating !== 'none') queryParams.append('ratings', rating);
 
-            const url = window.location.href;
-            let response;
-            if (url.includes("showing")) {
-                response = await fetch(`/api/movies/showing?${queryParams}`);
-                window.history.replaceState({}, '', `/search/showing?${queryParams}`);
-            } else if (url.includes("upcoming")) {
-                response = await fetch(`/api/movies/upcoming?${queryParams}`);
-                window.history.replaceState({}, '', `/search/upcoming?${queryParams}`);
-            } else {
-                response = await fetch(`/api/movies?${queryParams}`);
-                window.history.replaceState({}, '', `/search?${queryParams}`);
-            }
+            // update the current url appending the query params
+            window.history.pushState({}, '', `${window.location.pathname}?${queryParams}`);
+
+            let response = await fetch(`/api${window.location.pathname}?${queryParams}`);
             const data = await response.json();
             // renderNavFilm(data.all, data.showing, data.upcoming);
             renderDropdown(data);

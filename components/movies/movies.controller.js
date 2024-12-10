@@ -1,10 +1,11 @@
 const MovieService = require("./movies.service");
-const { getPageFromReq } = require("../../utility/extractRequest");
+const {getPageFromReq, getQueryFromReq} = require("../../utility/extractRequest");
 
 const renderMovieListByType = async (req, res, movieType) => {
     try {
         const page = getPageFromReq(req);
-        const movieData = await MovieService.getMovieListsByType(movieType, page);
+        const query = getQueryFromReq(req);
+        const movieData = await MovieService.getMovieListsByType(movieType, page, undefined, query);
         res.render("movie-list", {
             layout: "main", ...movieData
         });
@@ -30,9 +31,9 @@ exports.renderMoviePage = async (req, res) => {
         if (!movie) {
             return res
                 .status(404)
-                .render("404", { layout: "main", message: "Movie not found" });
+                .render("404", {layout: "main", message: "Movie not found"});
         }
-        res.render("movie-details", { layout: "main", ...movie });
+        res.render("movie-details", {layout: "main", ...movie});
     } catch (error) {
         console.error("Error fetching movie:", error);
         res.status(500).send("Internal server error");
