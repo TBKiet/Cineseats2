@@ -106,12 +106,12 @@
             debounceTimer = setTimeout(async () => {
 
                 feedbackElement.style.display = "flex";
-                // iconElement.innerHTML = `<div class="loader"></div>`;
-                // messageElement.textContent = "Checking...";
-                // messageElement.style.color = "blue";
-                //
-                // // sleep for 1 second
-                // await new Promise(resolve => setTimeout(resolve, 1000));
+                iconElement.innerHTML = `<div class="loader"></div>`;
+                messageElement.textContent = "Checking...";
+                messageElement.style.color = "blue";
+
+                // sleep for 1 second
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
                 if (field === 'email') {
                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
