@@ -13,4 +13,7 @@ router.post('/register', authController.register);
 //Logout route
 router.get("/logout", authController.logout);
 
+// Route to check availability of username and email
+router.post("/check-availability", authController.checkAvailability);
+
 module.exports = router;

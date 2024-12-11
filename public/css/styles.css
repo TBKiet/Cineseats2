@@ -376,6 +376,11 @@ ul {
     gap: 18px;
     margin-bottom: 15px;
 }
+#username-feedback,
+#email-feedback {
+    display: none;
+    align-items: center;
+}
 
 .input {
     border-radius: 20px;
@@ -922,3 +927,107 @@ ul {
 .copyright {
     color: #999999;
 }
+
+/* ______________________Register__________________________ */
+/* From Uiverse.io by guilhermeyohan */
+.checkbox-wrapper-31:hover .check {
+    stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper-31 {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.checkbox-wrapper-31 .background {
+    fill: #ccc;
+    transition: ease all 0.6s;
+    -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper-31 .stroke {
+    fill: none;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    stroke-width: 2px;
+    stroke-dashoffset: 100;
+    stroke-dasharray: 100;
+    transition: ease all 0.6s;
+    -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper-31 .check {
+    fill: none;
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2px;
+    stroke-dashoffset: 22;
+    stroke-dasharray: 22;
+    transition: ease all 0.6s;
+    -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper-31 input[type=checkbox] {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    margin: 0;
+    opacity: 0;
+    -appearance: none;
+    -webkit-appearance: none;
+}
+
+.checkbox-wrapper-31 input[type=checkbox]:hover {
+    cursor: pointer;
+}
+
+.checkbox-wrapper-31 input[type=checkbox]:checked + svg .background {
+    fill: #6cbe45;
+}
+
+.checkbox-wrapper-31 input[type=checkbox]:checked + svg .stroke {
+    stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper-31 input[type=checkbox]:checked + svg .check {
+    stroke-dashoffset: 0;
+}
+/* From Uiverse.io by Fernando-sv */
+.loader {
+    border: 4px solid rgba(0, 0, 0, .1);
+    border-left-color: transparent;
+    border-radius: 50%;
+}
+
+.loader {
+    border: 4px solid rgba(0, 0, 0, .1);
+    border-left-color: transparent;
+    width: 20px;
+    height: 20px;
+}
+
+.loader {
+    border: 4px solid rgba(0, 0, 255, 0.1); /* Light blue background */
+    border-left-color: blue; /* Spinner color */
+    width: 20px;
+    height: 20px;
+    animation: spin89345 1s linear infinite;
+}
+
+@keyframes spin89345 {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.error-svg {
+    color: #F87171;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+/* ______________________Register__________________________ */
