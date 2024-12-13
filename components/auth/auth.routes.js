@@ -16,4 +16,6 @@ router.get("/logout", authController.logout);
 // Route to check availability of username and email
 router.post("/check-availability", authController.checkAvailability);
 
+// route to verify email
+router.get("/verify", authController.verifyEmail);
 module.exports = router;

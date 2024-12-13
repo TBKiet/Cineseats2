@@ -1,6 +1,7 @@
 const {registerHandler} = require('./auth.service');
 const passport = require("passport");
 const User = require("./auth.models");
+const crypto = require('crypto');
 const renderLogin = (req, res) => {
     if (req.isAuthenticated()) {
         return res.redirect("/");
@@ -10,8 +11,7 @@ const renderLogin = (req, res) => {
 // Login controller
 const login = (req, res, next) => {
     passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/login'
+        successRedirect: '/', failureRedirect: '/login'
     })(req, res, next);
 };
 
@@ -28,8 +28,36 @@ const register = (req, res) => {
     email = email.trim();
     password = password.trim();
     re_password = re_password.trim();
-    registerHandler(username, email, password, re_password, res);
+    registerHandler(username, email, password, re_password, res, req);
 };
+
+const verifyEmail = async (req, res) => {
+    const token = req.query.token;
+
+    if (!token) {
+        return res.status(400).json({message: 'Token is missing'});
+    }
+
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    const user = await User.findOne({
+        activationToken: hashedToken, activationExpires: {$gt: Date.now()}
+    });
+
+    if (!user) {
+        return res.status(400).json({message: 'Token is invalid or has expired'});
+    }
+
+    user.isActive = true;
+    user.activationToken = undefined;
+    user.activationExpires = undefined;
+    await user.save();
+    res.status(200).json({message: 'Email verified successfully, you can now login'});
+    // res.redirect('/login');
+}
 const logout = (req, res, next) => { // Include next as a parameter
     req.logout((err) => {
         if (err) {
@@ -69,4 +97,4 @@ async function checkAvailability(req, res) {
     }
 }
 
-module.exports = {login, register, renderLogin, renderRegister, logout, checkAvailability};
+module.exports = {login, register, verifyEmail, renderLogin, renderRegister, logout, checkAvailability};

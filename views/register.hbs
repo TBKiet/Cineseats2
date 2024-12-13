@@ -88,6 +88,9 @@
     </div>
     <script>
         let debounceTimer; // Timer for debouncing
+        let checkEmail = false;
+        let checkUsername = false;
+        let checkPassword = false;
 
         async function checkAvailability(field, value) {
             const feedbackElement = document.getElementById(`${field}-feedback`);
@@ -123,6 +126,7 @@
                     </div>`; // Error icon
                         messageElement.textContent = "Invalid email address.";
                         messageElement.style.color = "red";
+                        checkEmail = false;
                         return;
                     }
                 }
@@ -149,6 +153,8 @@
 `;
                         messageElement.textContent = data.message;
                         messageElement.style.color = "green";
+                        if (field === 'email') checkEmail = true;
+                        if (field === 'username') checkUsername = true;
                     } else {
                         // Add error feedback
                         iconElement.innerHTML = `<div class="flex-shrink-0">
@@ -197,7 +203,7 @@
                     feedbackElement.textContent = "Weak. Please improve your password.";
                     feedbackElement.style.color = 'red';
                 } else if (strength === 2) {
-                    feedbackElement.textContent = "Fair. Your password could be stronger.";
+                    feedbackElement.textContent = "Fair. Your password must be stronger.";
                     feedbackElement.style.color = 'orange';
                 } else if (strength === 3) {
                     feedbackElement.textContent = "Good! Your password is strong.";
@@ -207,6 +213,7 @@
                     feedbackElement.style.color = 'green';
                 }
                 feedbackElement.style.display = 'block';
+                checkPassword = strength >= 3;
             }
         });
 
@@ -224,6 +231,14 @@
                 feedbackElement.textContent = "Passwords match.";
                 feedbackElement.style.color = 'green';
                 feedbackElement.style.display = 'block';
+            }
+        });
+
+        document.querySelector('.form').addEventListener('submit', function(event) {
+            if(!checkEmail || !checkUsername || !checkPassword) {
+                alert('Please check the availability of the fields.');
+                event.preventDefault(); // Prevent form submission
+                return;
             }
         });
     </script>
