@@ -56,8 +56,7 @@
         <div class="row gx-3 gx-sm-4 gy-3 gy-sm-4" id="movie-list">
             {{#if movies.length}}
             {{#each movies}}
-            <div class="col-6 col-sm-6 col-xl-3 movie-item" data-genre="{{this.genre}}" data-age="{{this.limitage_vn}}"
-                data-rating="{{this.ratings}}" data-country="{{this.type_name_vn}}">
+            <div class="col-6 col-sm-6 col-xl-3 movie-item">
                 <div class="brief-des">
                     <a href="/movies/{{this.id}}">
                         <img src="{{this.image}}" alt="{{this.name_vn}}" class="img-fluid">
@@ -98,110 +97,170 @@
             <ul class="pagination justify-content-center">
                 {{#if (gt currentPage 1)}}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{subtract currentPage 1}}" aria-label="Previous">
+                    <button class="page-link prev-page" aria-label="Previous" data-page="{{subtract currentPage 1}}">
                         <span aria-hidden="true">&laquo;</span>
-                    </a>
+                    </button>
                 </li>
                 {{/if}}
                 {{#each (range 1 totalPages)}}
                 <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
-                    <a class="page-link" href="?page={{this}}">{{this}}</a>
+                    <button class="page-link page-number" data-page="{{this}}">{{this}}</button>
                 </li>
                 {{/each}}
                 {{#if (lt currentPage totalPages)}}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{add currentPage 1}}" aria-label="Next">
+                    <button class="page-link next-page" aria-label="Next" data-page="{{add currentPage 1}}">
                         <span aria-hidden="true">&raquo;</span>
-                    </a>
+                    </button>
                 </li>
                 {{/if}}
             </ul>
         </nav>
+
     </div>
 </section>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Load saved filter values from localStorage
-        const savedGenre = localStorage.getItem('genre-filter');
-        const savedAge = localStorage.getItem('age-filter');
-        const savedRating = localStorage.getItem('rating-filter');
-        const savedCountry = localStorage.getItem('country-filter');
+        const searchParams = new URLSearchParams(window.location.search);
+        const genre = searchParams.get('genre') || 'none';
+        const age = searchParams.get('age') || 'none';
+        const rating = searchParams.get('rating') || 'none';
+        const country = searchParams.get('country') || 'none';
 
-        if (savedGenre) {
-            document.getElementById('genre-filter').value = savedGenre;
-        }
-        if (savedAge) {
-            document.getElementById('age-filter').value = savedAge;
-        }
-        if (savedRating) {
-            document.getElementById('rating-filter').value = savedRating;
-        }
-        if (savedCountry) {
-            document.getElementById('country-filter').value = savedCountry;
-        }
+        document.getElementById('genre-filter').value = genre;
+        document.getElementById('age-filter').value = age;
+        document.getElementById('rating-filter').value = rating;
+        document.getElementById('country-filter').value = country;
+        // Attach click event to filter button
+        document.getElementById('filter-button').addEventListener('click', function () {
+            fetchMovies(); // Reset to page 1 when filters change
+        });
+        attachPaginationListeners();
+
     });
 
-    document.getElementById('filter-button').addEventListener('click', function () {
-        // Get values from the form elements
+    function fetchMovies(page = 1) {
+        const searchParams = new URLSearchParams(window.location.search)
+        const keyword = searchParams.get('keyword');
         const genre = document.getElementById('genre-filter')?.value || 'none';
         const age = document.getElementById('age-filter').value || 'none';
         const rating = document.getElementById('rating-filter').value || 'none';
         const country = document.getElementById('country-filter').value || 'none';
-        const queryParams = new URLSearchParams();
 
-        // Save filter values to localStorage
-        localStorage.setItem('genre-filter', genre);
-        localStorage.setItem('age-filter', age);
-        localStorage.setItem('rating-filter', rating);
-        localStorage.setItem('country-filter', country);
+        let queryParams = new URLSearchParams();
+        if (keyword) queryParams.append('keyword', keyword);
+        if (genre !== 'none') queryParams.append('genre', genre);
+        if (age !== 'none') queryParams.append('age', age);
+        if (country !== 'none') queryParams.append('country', country);
+        if (rating !== 'none') queryParams.append('rating', rating);
+        if (page !== 1) queryParams.append('page', page);
 
-        // Append filter values to queryParams if not 'none'
-        if (genre !== 'none') {
-            queryParams.append('genre', genre);
-        }
-        if (age !== 'none') {
-            queryParams.append('age', age);
-        }
-        if (country !== 'none') {
-            queryParams.append('country', country);
-        }
-        if (rating !== 'none') {
-            queryParams.append('rating', rating);
-        }
+        let queryUrl = queryParams.toString() ? `${window.location.pathname}?${queryParams.toString()}` : window.location.pathname;
+        window.history.pushState({ path: queryUrl }, '', queryUrl);
 
-        // Get the current path
-        const currentPath = window.location.href;
-        let url = `/search?${queryParams}`;
-
-        // Adjust URL based on the current path (showing, upcoming, etc.)
-        if (currentPath.includes('/showing')) {
-            url = `/search/showing?${queryParams}`;
-        } else if (currentPath.includes('/upcoming')) {
-            url = `/search/upcoming?${queryParams}`;
-        } else if (currentPath.includes('/search?keyword')) {
-            // Handle case where URL already contains search parameters (e.g., search?keyword=value)
-            const currentUrl = new URL(window.location.href);
-            // Combine existing search parameters with new ones
-            const existingParams = new URLSearchParams(currentUrl.search);
-            queryParams.forEach((value, key) => {
-                existingParams.set(key, value);  // Use set to ensure they are updated
-            });
-            currentUrl.search = existingParams.toString();
-            url = currentUrl.toString(); // Get the updated URL with combined query parameters
-        }
-        // Use fetch to send the request (optional, for dynamic data handling)
-        fetch(url)
-            .then(response => response.json())  // Assuming the response is JSON
+        fetch(`/api${queryUrl}`)
+            .then(response => response.json())
             .then(data => {
-                console.log(data);  // Handle the returned data
-                // You can update the page dynamically with the new data here
+                renderMovies(data.movies);
+                renderPagination(data.currentPage, data.totalPages);
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error fetching movies:', error);
+                document.getElementById('movie-list').innerHTML = `
+                    <div class="text-box p-0 mt-1 mb-5">
+                        <h1>Error loading movies. Please try again later.</h1>
+                    </div>
+                `;
             });
+    }
 
-        // Redirect to the constructed URL
-        window.location.href = url;
-    });
+    function renderMovies(movies) {
+        const movieList = document.getElementById('movie-list');
+        movieList.innerHTML = '';
+
+        if (movies.length) {
+            movies.forEach(movie => {
+                const movieItem = document.createElement('div');
+                movieItem.className = 'col-6 col-sm-6 col-xl-3 movie-item';
+                movieItem.innerHTML = `
+                    <div class="brief-des">
+                        <a href="/movies/${movie.id}">
+                            <img src="${movie.image}" alt="${movie.name_vn}" class="img-fluid">
+                        </a>
+                        <div class="rating">
+                            ${movie.ratings ? `<i class="fa-solid fa-star"></i><p>${movie.ratings}</p>` : ''}
+                        </div>
+                        <div class="age-limit">${movie.limitage_vn}</div>
+                        <a href="/movies/${movie.id}">
+                            <div class="text-container">
+                                <ul>
+                                    <li><i class="fa-solid fa-tag"></i> ${movie.type_name_vn}</li>
+                                    <li><i class="fa-solid fa-clock"></i> ${movie.time} phút</li>
+                                    <li><i class="fa-solid fa-globe"></i> ${movie.country_name_vn}</li>
+                                </ul>
+                            </div>
+                        </a>
+                    </div>
+                    <p class="mv-name">${movie.name_vn}</p>
+                `;
+                movieList.appendChild(movieItem);
+            });
+        } else {
+            movieList.innerHTML = `
+                <div class="text-box p-0 mt-1 mb-5">
+                    <h1>No Movies Found</h1>
+                    <h1>No Movies Found</h1>
+                </div>
+            `;
+        }
+    }
+
+    function renderPagination(currentPage, totalPages) {
+        const pagination = document.querySelector('.pagination.justify-content-center');
+        pagination.innerHTML = '';
+
+        // Add previous page button
+        if (currentPage > 1) {
+            const prevPageItem = document.createElement('li');
+            prevPageItem.className = 'page-item';
+            prevPageItem.innerHTML = `
+                <button class="page-link prev-page" aria-label="Previous" data-page="${currentPage - 1}">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+            `;
+            pagination.appendChild(prevPageItem);
+        }
+
+        // Add page number buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            pageItem.innerHTML = `<button class="page-link page-number" data-page="${i}">${i}</button>`;
+            pagination.appendChild(pageItem);
+        }
+
+        // Add next page button
+        if (currentPage < totalPages) {
+            const nextPageItem = document.createElement('li');
+            nextPageItem.className = 'page-item';
+            nextPageItem.innerHTML = `
+                <button class="page-link next-page" aria-label="Next" data-page="${currentPage + 1}">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            `;
+            pagination.appendChild(nextPageItem);
+        }
+
+        attachPaginationListeners();
+    }
+
+    function attachPaginationListeners() {
+        document.querySelectorAll('.page-link').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const page = event.target.closest('button').getAttribute('data-page');
+                fetchMovies(page);
+            });
+        });
+    }
 </script>

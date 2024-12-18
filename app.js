@@ -7,14 +7,15 @@ const { engine } = require("express-handlebars");
 const path = require("path");
 const MongoStore = require("connect-mongo");
 
-const movieRouter = require("./libraries/movies/movies.routes");
-const searchRouter = require("./components/search/search.routes");
-const homeRouter = require("./components/users/routes");
+const movieRouter = require("./components/movies/movies.routes");
+const homeRouter = require("./components/home/home.routes");
 const userRouter = require("./components/auth/auth.routes");
 const profileRouter = require("./components/profile/profile.routes");
 
 const movieDBConnection = require('./config/movieDBConnection');
 const userDBConnection = require('./config/userDBConnection');
+
+const apiMoviesRouter = require('./api/movies/movies.routes');
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api/movies', apiMoviesRouter);
 // Set up session middleware with MongoDB store
 app.use(session({
     secret: process.env.SESSION_SECRET, // Replace with your own secret
@@ -81,7 +83,6 @@ app.use((req, res, next) => {
 app.use("/", userRouter);
 app.use("/", homeRouter);
 app.use("/movies", movieRouter);
-app.use("/search", searchRouter);
 app.use("/profile", profileRouter);
 
 app.get("/about", (req, res) => {

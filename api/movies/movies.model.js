@@ -38,8 +38,4 @@ const MovieSchema = new mongoose.Schema({
 });
 const Movie = movieDBConnection.model("movie", MovieSchema);
 
-//pagination
-// const paginate = require('mongoose-paginate-v2');
-// MovieSchema.plugin(paginate);
-
 module.exports = Movie;
