@@ -97,7 +97,7 @@ body {
     pointer-events: painted;
 }
 
-.btn-search:focus~.search-field {
+.btn-search:focus ~ .search-field {
     width: 300px;
     background-color: transparent;
     border: 1px solid #ffffff;
@@ -363,7 +363,7 @@ ul {
 .title {
     text-align: center;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
     margin: 10px 0 30px 0;
     font-size: 28px;
     font-weight: 800;
@@ -376,6 +376,7 @@ ul {
     gap: 18px;
     margin-bottom: 15px;
 }
+
 #username-feedback,
 #email-feedback {
     display: none;
@@ -397,7 +398,7 @@ ul {
 .form-btn {
     padding: 10px 15px;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
     border-radius: 20px;
     border: 0 !important;
     outline: 0 !important;
@@ -413,22 +414,24 @@ ul {
 
 .sign-up-label {
     margin: 0;
-    font-size: 10px;
+    font-size: 14px;
     color: #747474;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
 
 .sign-up-link {
     margin-left: 1px;
-    font-size: 11px;
-    text-decoration: underline;
-    text-decoration-color: #184e8e;
+    font-size: 14px;
+    text-decoration: none;
     color: #184e8e;
     cursor: pointer;
     font-weight: 800;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+.sign-up-link:hover {
+    text-decoration: underline;
 }
 
 .buttons-container {
@@ -451,7 +454,7 @@ ul {
     justify-content: center;
     align-items: center;
     font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
-        "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
     font-size: 11px;
     gap: 5px;
 }
@@ -781,10 +784,11 @@ ul {
     .links .links-inner {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .form-control {
-        font-size: 0.8rem!important;
+        font-size: 0.8rem !important;
     }
-    
+
     #filter-button {
         font-size: 0.8rem;
     }
@@ -802,10 +806,11 @@ ul {
     .links .links-inner ul {
         margin-bottom: 20px;
     }
+
     .form-control {
-        font-size: 0.8rem!important;
+        font-size: 0.8rem !important;
     }
-    
+
     #filter-button {
         font-size: 0.8rem;
     }
@@ -847,7 +852,6 @@ ul {
     /*search-form*/
     /* Styling adjustments for better alignment */
 }
-
 
 
 .single-cta {
@@ -997,6 +1001,7 @@ ul {
 .checkbox-wrapper-31 input[type=checkbox]:checked + svg .check {
     stroke-dashoffset: 0;
 }
+
 /* From Uiverse.io by Fernando-sv */
 .loader {
     border: 4px solid rgba(0, 0, 0, .1);
@@ -1030,4 +1035,105 @@ ul {
     width: 1.25rem;
     height: 1.25rem;
 }
+
 /* ______________________Register__________________________ */
+
+/* ______________________Forgot password form __________________________ */
+.forgotPassword-form-container {
+    max-width: 400px;
+    background-color: #fff;
+    padding: 32px 24px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #212121;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+}
+
+.forgotPassword-form-container button:active {
+    scale: 0.95;
+}
+
+.forgotPassword-form-container .logo-container {
+    text-align: center;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.forgotPassword-form-container .form {
+    display: flex;
+    flex-direction: column;
+}
+
+.forgotPassword-form-container .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.forgotPassword-form-container .form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.forgotPassword-form-container .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-family: inherit;
+    border: 1px solid #ccc;
+}
+
+.forgotPassword-form-container .form-group input::placeholder {
+    opacity: 0.5;
+}
+
+.forgotPassword-form-container .form-group input:focus {
+    outline: none;
+    border-color: #1778f2;
+}
+
+.forgotPassword-form-container .form-submit-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: inherit;
+    color: #fff;
+    background-color: #212121;
+    border: none;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: inherit;
+    gap: 8px;
+    margin: 12px 0;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.084), 0px 2px 3px rgba(0, 0, 0, 0.168);
+}
+
+.forgotPassword-form-container .form-submit-btn:hover {
+    background-color: #313131;
+}
+
+.forgotPassword-form-container .link {
+    color: #1778f2;
+    text-decoration: none;
+}
+
+.forgotPassword-form-container .signup-link {
+    align-self: center;
+    font-weight: 500;
+}
+
+.forgotPassword-form-container .signup-link .link {
+    font-weight: 400;
+}
+
+.forgotPassword-form-container .link:hover {
+    text-decoration: underline;
+}
+

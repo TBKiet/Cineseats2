@@ -33,21 +33,11 @@ async function registerHandler(username, email, password, re_password, res, req)
         return renderAlert('Please enter all fields', 'danger');
     }
 
-    if (password.length < 8) {
+    const strength = passwordStrength(password);
+
+    if (strength === 0) {
         return renderAlert('Password must be at least 8 characters', 'danger');
     }
-
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumbers = /\d/.test(password);
-    const hasNonalphas = /\W/.test(password);
-
-    let strength = 0;
-    if (hasUpperCase) strength++;
-    if (hasLowerCase) strength++;
-    if (hasNumbers) strength++;
-    if (hasNonalphas) strength++;
-
     if (strength < 3) {
         return renderAlert('Your password is not strong enough', 'danger');
     }
