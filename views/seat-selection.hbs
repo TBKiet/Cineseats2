@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html,
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 0;
+        }
+
+        .screen-container {
+            position: fixed;
+            margin-top: 30px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 10;
+        }
+
+        .screen {
+            width: 90%;
+            height: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -5%;
+            width: 110%;
+            height: 200px;
+            border: 3px solid #172a74;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(23, 42, 116, 0.2) 0%, rgba(255, 255, 255, 0) 40%);
+        }
+
+        /* Add padding to theater container to prevent overlap with fixed screen */
+        .theater-container {
+            margin-top: 120px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 20px;
+            padding-bottom: 100px;
+            /* Add padding to prevent content from being hidden behind the sticky bar */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screen-text {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #47566b;
+            font-size: 1.3rem;
+            white-space: nowrap;
+        }
+
+        .seating-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 35px;
+            /* Fixed height for consistency */
+        }
+
+        .row-label {
+            color: rgba(0, 0, 0, 0.70);
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .seat {
+            width: 35px;
+            height: 25px;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: black;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            border: 1px solid #172a74;
+            /* Prevent seat shrinking */
+        }
+
+        .seat:hover {
+            background: #21a8afce;
+        }
+
+        .seat.selected {
+            background-color: #21a8afce;
+            /* Change to your desired color */
+            color: #fff;
+            /* Optional: change text color for better contrast */
+        }
+
+        .seat.unavailable {
+            background: #47566b;
+            color: #979ca3;
+            cursor: not-allowed;
+        }
+
+        .seat.empty {
+            visibility: hidden;
+        }
+
+        #rectangle {
+            position: absolute;
+            border: 2px solid red;
+            border-radius: 10px;
+        }
+
+        .legend-container {
+            position: fixed;
+            top: 600px;
+            /* Position right below the screen container */
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: white;
+            z-index: 9;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-box {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #172a74;
+        }
+
+        .legend-box.sold {
+            background-color: #47566b;
+        }
+
+        .legend-box.available {
+            background-color: white;
+        }
+
+        .legend-box.selected {
+            background-color: #21a8afce;
+        }
+
+        .legend-text {
+            font-size: 0.9rem;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 600px) {
+            .legend-container {
+                flex-direction: column;
+            }
+
+            .legend-item {
+                justify-content: flex-start;
+            }
+        }
+
+        .sold {
+            background-color: #cccccc;
+        }
+
+        .seat.selected {
+            background-color: #21a8afce;
+        }
+
+        .bottom-rectangle {
+            position: fixed;
+            /* Change from sticky to fixed */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: white;
+            border-top: 2px solid #172a74;
+            border-bottom: 2px solid #172a74;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            box-sizing: border-box;
+            /* Add this to include padding in width calculation */
+        }
+
+        .movie-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .movie-title {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #172a74;
+
+        }
+
+        .show-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .separator {
+            margin: 0 8px;
+        }
+
+        .booking-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: right;
+        }
+
+        .selected-info,
+        .total-price {
+            font-size: 1.2rem;
+            color: #172a74;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screen-container">
+        <div class="screen">
+            <div class="screen-text">Screen</div>
+        </div>
+    </div>
+
+    <div class="theater-container">
+        <div class="seating-container">
+            <!-- Row A -->
+            <div class="row">
+                <div class="row-label">A</div>
+                <div class="seat empty"></div>
+                <div class="seat empty"></div>
+                <div class="seat empty"></div>
+                <div class="seat empty"></div>
+                <div class="seat">A01</div>
+                <div class="seat">A02</div>
+                <div class="seat">A03</div>
+                <div class="seat">A04</div>
+                <div class="seat">A05</div>
+                <div class="seat">A06</div>
+                <div class="seat">A07</div>
+                <div class="seat">A08</div>
+                <div class="seat">A09</div>
+                <div class="seat">A10</div>
+                <div class="seat">A11</div>
+                <div class="seat empty"></div>
+                <div class="row-label">A</div>
+            </div>
+
+            <!-- Row B -->
+            <div class="row">
+                <div class="row-label">B</div>
+                <div class="seat empty"></div>
+                <div class="seat">B01</div>
+                <div class="seat">B02</div>
+                <div class="seat">B03</div>
+                <div class="seat">B04</div>
+                <div class="seat">B05</div>
+                <div class="seat">B06</div>
+                <div class="seat">B07</div>
+                <div class="seat">B08</div>
+                <div class="seat">B09</div>
+                <div class="seat">B10</div>
+                <div class="seat">B11</div>
+                <div class="seat">B12</div>
+                <div class="seat">B13</div>
+                <div class="seat">B14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">B</div>
+            </div>
+
+            <div class="row">
+                <div class="row-label">C</div>
+                <div class="seat empty"></div>
+                <div class="seat">C01</div>
+                <div class="seat">C02</div>
+                <div class="seat">C03</div>
+                <div class="seat">C04</div>
+                <div class="seat">C05</div>
+                <div class="seat">C06</div>
+                <div class="seat">C07</div>
+                <div class="seat">C08</div>
+                <div class="seat">C09</div>
+                <div class="seat">C10</div>
+                <div class="seat">C11</div>
+                <div class="seat">C12</div>
+                <div class="seat">C13</div>
+                <div class="seat">C14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">C</div>
+            </div>
+            <div class="row">
+                <div class="row-label">D</div>
+                <div class="seat empty"></div>
+                <div class="seat">D01</div>
+                <div class="seat">D02</div>
+                <div class="seat">D03</div>
+                <div class="seat">D04</div>
+                <div class="seat">D05</div>
+                <div class="seat">D06</div>
+                <div class="seat">D07</div>
+                <div class="seat">D08</div>
+                <div class="seat">D09</div>
+                <div class="seat">D10</div>
+                <div class="seat">D11</div>
+                <div class="seat">D12</div>
+                <div class="seat">D13</div>
+                <div class="seat">D14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">D</div>
+            </div>
+            <div class="row">
+                <div class="row-label">E</div>
+                <div class="seat empty"></div>
+                <div class="seat">E01</div>
+                <div class="seat">E02</div>
+                <div class="seat">E03</div>
+                <div class="seat" id="seat-top-left">E04</div>
+                <div class="seat">E05</div>
+                <div class="seat unavailable">E06</div>
+                <div class="seat unavailable">E07</div>
+                <div class="seat unavailable">E08</div>
+                <div class="seat">E09</div>
+                <div class="seat">E10</div>
+                <div class="seat">E11</div>
+                <div class="seat">E12</div>
+                <div class="seat">E13</div>
+                <div class="seat">E14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">E</div>
+            </div>
+            <div class="row">
+                <div class="row-label">F</div>
+                <div class="seat empty"></div>
+                <div class="seat">F01</div>
+                <div class="seat">F02</div>
+                <div class="seat">F03</div>
+                <div class="seat">F04</div>
+                <div class="seat unavailable">F05</div>
+                <div class="seat unavailable">F06</div>
+                <div class="seat">F07</div>
+                <div class="seat">F08</div>
+                <div class="seat">F09</div>
+                <div class="seat">F10</div>
+                <div class="seat">F11</div>
+                <div class="seat">F12</div>
+                <div class="seat">F13</div>
+                <div class="seat">F14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">F</div>
+            </div>
+            <div class="row">
+                <div class="row-label">G</div>
+                <div class="seat empty"></div>
+                <div class="seat">G01</div>
+                <div class="seat">G02</div>
+                <div class="seat">G03</div>
+                <div class="seat">G04</div>
+                <div class="seat">G05</div>
+                <div class="seat">G06</div>
+                <div class="seat">G07</div>
+                <div class="seat">G08</div>
+                <div class="seat">G09</div>
+                <div class="seat unavailable">G10</div>
+                <div class="seat unavailable" id="seat-bottom-right">G11</div>
+                <div class="seat">G12</div>
+                <div class="seat">G13</div>
+                <div class="seat">G14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">G</div>
+            </div>
+            <div class="row">
+                <div class="row-label">H</div>
+                <div class="seat empty"></div>
+                <div class="seat">H01</div>
+                <div class="seat">H02</div>
+                <div class="seat">H03</div>
+                <div class="seat">H04</div>
+                <div class="seat">H05</div>
+                <div class="seat">H06</div>
+                <div class="seat">H07</div>
+                <div class="seat">H08</div>
+                <div class="seat">H09</div>
+                <div class="seat">H10</div>
+                <div class="seat">H11</div>
+                <div class="seat">H12</div>
+                <div class="seat">H13</div>
+                <div class="seat">H14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">H</div>
+            </div>
+            <div class="row">
+                <div class="row-label">I</div>
+                <div class="seat empty"></div>
+                <div class="seat">I01</div>
+                <div class="seat">I02</div>
+                <div class="seat">I03</div>
+                <div class="seat">I04</div>
+                <div class="seat">I05</div>
+                <div class="seat">I06</div>
+                <div class="seat">I07</div>
+                <div class="seat">I08</div>
+                <div class="seat">I09</div>
+                <div class="seat">I10</div>
+                <div class="seat">I11</div>
+                <div class="seat">I12</div>
+                <div class="seat">I13</div>
+                <div class="seat">I14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">I</div>
+            </div>
+            <div class="row">
+                <div class="row-label">J</div>
+                <div class="seat empty"></div>
+                <div class="seat">J01</div>
+                <div class="seat">J02</div>
+                <div class="seat">J03</div>
+                <div class="seat">J04</div>
+                <div class="seat">J05</div>
+                <div class="seat">J06</div>
+                <div class="seat">J07</div>
+                <div class="seat">J08</div>
+                <div class="seat">J09</div>
+                <div class="seat">J10</div>
+                <div class="seat">J11</div>
+                <div class="seat">J12</div>
+                <div class="seat">J13</div>
+                <div class="seat">J14</div>
+                <div class="seat empty"></div>
+                <div class="row-label">J</div>
+            </div>
+        </div>
+    </div>
+    <div class="legend-container">
+        <div class="legend-item">
+            <div class="seat"></div>
+            <span class="legend-text">Ghế thường</span>
+        </div>
+        <div class="legend-item">
+            <div class="seat unavailable"></div>
+            <span class="legend-text">Ghế đã bán</span>
+        </div>
+        <div class="legend-item">
+            <div class="seat selected"></div>
+            <span class="legend-text">Ghế đang chọn</span>
+        </div>
+    </div>
+    <div id="rectangle"></div>
+    <div class="bottom-rectangle">
+        <div class="movie-info">
+            <h3 class="movie-title">The Dark Knight</h3>
+            <div class="show-details">
+                <span class="theater-name">CGV Aeon Mall</span>
+                <span class="separator">•</span>
+                <span class="showtime">Today, 19:30</span>
+            </div>
+        </div>
+        <div class="booking-info">
+            <div class="selected-info">
+                <span>Selected Seats: </span>
+                <span id="selected-seats-display">None</span>
+            </div>
+            <div class="total-price">
+                <span>Total: </span>
+                <span id="total-price-display">$0</span>
+            </div>
+        </div>
+    </div>
+    <script>
+        const seats = document.querySelectorAll('.seat:not(.unavailable):not(.empty)');
+
+        // Add a click event listener to each seat
+        seats.forEach((seat) => {
+            seat.addEventListener('click', () => {
+                seat.classList.toggle('selected');
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            function drawRectangle() {
+                const topLeft = document.getElementById('seat-top-left');
+                const bottomRight = document.getElementById('seat-bottom-right');
+
+                if (topLeft && bottomRight) {
+                    const topLeftRect = topLeft.getBoundingClientRect();
+                    const bottomRightRect = bottomRight.getBoundingClientRect();
+
+                    // Amount by which to expand the rectangle (in pixels)
+                    const expandBy = 10;
+
+                    // Calculate dimensions including scroll offset and expansion
+                    const rectangle = document.getElementById('rectangle');
+
+                    // Adjust left and top positions
+                    const left = topLeftRect.left + window.scrollX - expandBy / 2;
+                    const top = topLeftRect.top + window.scrollY - expandBy / 2;
+
+                    // Adjust width and height
+                    const width = bottomRightRect.right - topLeftRect.left + expandBy / 2 + 1;
+                    const height = bottomRightRect.bottom - topLeftRect.top + expandBy / 2 + 1;
+
+                    // Apply styles to the rectangle
+                    rectangle.style.left = `${left}px`;
+                    rectangle.style.top = `${top}px`;
+                    rectangle.style.width = `${width}px`;
+                    rectangle.style.height = `${height}px`;
+
+                    // Ensure rectangle stays visible
+                    rectangle.style.position = 'absolute';
+                    rectangle.style.pointerEvents = 'none'; // Prevent interference with seats
+                }
+            }
+
+            // Initial draw
+            drawRectangle();
+
+            // Handle both horizontal and vertical scrolling
+            document.querySelector('.theater-container').addEventListener('scroll', drawRectangle);
+            window.addEventListener('scroll', drawRectangle);
+            window.addEventListener('resize', drawRectangle);
+        });
+    </script>
+
+</body>
+
+</html>
