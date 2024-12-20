@@ -59,6 +59,8 @@ app.engine(
             eq: (a, b) => a === b,
             gt: (a, b) => a > b,
             lt: (a, b) => a < b,
+            lte: (a, b) => a <= b,
+            and: (a, b) => a && b,
             range: (start, end) => {
                 const range = [];
                 for (let i = start; i <= end; i++) {

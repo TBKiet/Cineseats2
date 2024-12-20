@@ -154,7 +154,9 @@
         if (age !== 'none') queryParams.append('age', age);
         if (country !== 'none') queryParams.append('country', country);
         if (rating !== 'none') queryParams.append('rating', rating);
-        if (page !== 1) queryParams.append('page', page);
+        if (page != 1) {
+            queryParams.append('page', page);
+        }
 
         let queryUrl = queryParams.toString() ? `${window.location.pathname}?${queryParams.toString()}` : window.location.pathname;
         window.history.pushState({ path: queryUrl }, '', queryUrl);

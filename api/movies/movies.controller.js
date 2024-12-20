@@ -1,7 +1,6 @@
 const { getMovieListsByType, getMovieById } = require('./movies.service');
 exports.getMoviesJson = async (req, res) => {
     try {
-        console.log(req.query);
         const queryParam = {
             name_vn: req.query.keyword,
             type_name_vn: req.query.genre,
@@ -10,7 +9,7 @@ exports.getMoviesJson = async (req, res) => {
         }
         const page = parseInt(req.query.page) || 1;
         const movieType = req._parsedUrl.pathname;
-        const movieData = await getMovieListsByType(movieType, queryParam,page);
+        const movieData = await getMovieListsByType(movieType, queryParam, page);
         res.json(movieData);
     } catch (error) {
         console.error("Error loading movies:", error);
