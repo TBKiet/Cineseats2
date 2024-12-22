@@ -58,7 +58,7 @@
                     queryParams.append('keyword', searchField.value.trim());
                     if (page != 1) queryParams.append('page', page);
 
-                    document.getElementById('search-field').value = 'none';
+                    document.getElementById('search-field').value = null; // Clear the search field
                     // Get the current URL
                     const currentPath = window.location.href;
                     let searchUrl = '';

@@ -7,53 +7,92 @@
         </div>
         {{#if background_image_url}}
         <div class="mv-detail" style="background: url({{background_image_url}}); background-size: cover;">
-        {{else}}
-        <div class="mv-detail" style="background-size: cover;">
-        {{/if}}
-            <div class="popular-movie-slider">
-                <img src="{{image}}" alt="{{name_vn}}" class="poster">
+            {{else}}
+            <div class="mv-detail" style="background-size: cover;">
+                {{/if}}
+                <div class="popular-movie-slider">
+                    <img src="{{image}}" alt="{{name_vn}}" class="poster">
 
-                <div class="popular-movie-slider-content">
-                    <p class="release">Ngày khởi chiếu: {{release_date}}</p>
-                    <h2 class="movie-name">{{name_vn}}</h2>
-                    <ul class="category">
-                        <li>
-                            <p>Thể loại: {{type_name_vn}}</p>
-                        </li>
-                        <li>
-                            <p>Nhà sản xuất: {{production}}</p>
-                        </li>
-                        <li>
-                            <p>Đạo diễn: {{director}}</p>
-                        </li>
-                        <li>
-                            <p>Diễn viên: {{actor}}</p>
-                        </li>
-                    </ul>
+                    <div class="popular-movie-slider-content">
+                        <p class="release">Ngày khởi chiếu: {{release_date}}</p>
+                        <h2 class="movie-name">{{name_vn}}</h2>
+                        <ul class="category">
+                            <li>
+                                <p>Thể loại: {{type_name_vn}}</p>
+                            </li>
+                            <li>
+                                <p>Nhà sản xuất: {{production}}</p>
+                            </li>
+                            <li>
+                                <p>Đạo diễn: {{director}}</p>
+                            </li>
+                            <li>
+                                <p>Diễn viên: {{actor}}</p>
+                            </li>
+                        </ul>
 
-                    <p class="desc">{{brief_vn}}</p>
+                        <p class="desc">{{brief_vn}}</p>
 
-                    <div class="movie-info">
-                        <p><i class="fa-solid fa-clock"></i> {{time}} phút</p>
-                        {{#if country_name_vn}}
-                        <p><i class="fa-solid fa-globe"></i> {{country_name_vn}}</p>
-                        {{else}}
-                        <p><i class="fa-solid fa-globe"></i> Đang cập nhật</p>
-                        {{/if}}
-                        {{#if ratings}}
-                        <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> {{ratings}}</p>
-                        {{else}}
-                        <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> 0.0</p>
-                        {{/if}}
-                    </div>
-                    <div class="movie-btns">
-                        <button>
-                            <p><i class="fa-solid fa-ticket"></i> Đặt Vé</p>
-                        </button>
+                        <div class="movie-info">
+                            <p><i class="fa-solid fa-clock"></i> {{time}} phút</p>
+                            {{#if country_name_vn}}
+                            <p><i class="fa-solid fa-globe"></i> {{country_name_vn}}</p>
+                            {{else}}
+                            <p><i class="fa-solid fa-globe"></i> Đang cập nhật</p>
+                            {{/if}}
+                            {{#if ratings}}
+                            <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> {{ratings}}</p>
+                            {{else}}
+                            <p><i class="fa-solid fa-star" style="color: #FFD43B;"></i> 0.0</p>
+                            {{/if}}
+                        </div>
                     </div>
 
                 </div>
+            </div>
+            <div class="showtime-container">
+                <h1>Lịch Chiếu</h1>
 
+                <div class="top-section">
+                    <div class="date-selector">
+                        {{#each uniqueDates}}
+                        <button class="date-btn {{#if @first}}active{{/if}}">
+                            <div class="day">{{this.date}}</div>
+                            <div class="weekday">{{this.dayOfWeek}}</div>
+                        </button>
+                        {{/each}}
+                    </div>
+
+                    <div class="filter-section">
+                        <select class="filter-dropdown form-control">
+                            <option class="filter-btn" value="none" selected>Tất cả rạp</option>
+                            {{#each uniqueCity}}
+                            <option class="filter-btn" value="{{this.city}}">{{this.city}}</option>
+                            {{/each}}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="theater-section">
+                    {{#each theaters}}
+                    <div class="theater">
+                        <div class="theater-header">
+                            <div class="theater-logo"></div>
+                            <div class="theater-info">
+                                <h2>{{this.theaterName}}</h2>
+                                <p>{{this.address}}</p>
+                            </div>
+                        </div>
+                        <div class="showtimes">
+                            {{#each showtimes}}
+                            <div class="showtime">
+                                <span class="time">{{this.startTime}}</span>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
             </div>
         </div>
         <!---slider--->
@@ -70,8 +109,8 @@
                             </a>
                             <div class="rating">
                                 {{#if this.ratings}}
-                                    <i class="fa-solid fa-star"></i>
-                                    <p>{{this.ratings}}</p>
+                                <i class="fa-solid fa-star"></i>
+                                <p>{{this.ratings}}</p>
                                 {{/if}}
                             </div>
                             <div class="age-limit">{{this.limitage_vn}}</div>
@@ -85,3 +124,64 @@
         </div>
     </div>
 </section>
+<script>
+    document.querySelectorAll(".date-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+            document.querySelectorAll(".date-btn").forEach((btn) => {
+                btn.classList.remove("active");
+            });
+            button.classList.add("active");
+            const date = button.querySelector(".day").textContent;
+            const city = document.querySelector(".filter-dropdown").value;
+            fetchShowtime("{{id}}", date, city);
+        });
+    });
+    document.querySelector(".filter-dropdown").addEventListener("change", () => {
+        const date = document.querySelector(".date-btn.active .day").textContent;
+        const city = document.querySelector(".filter-dropdown").value;
+        fetchShowtime("{{id}}",date, city);
+    });
+    function fetchShowtime(movieId, date, city) {
+        let queryParams = new URLSearchParams();
+        queryParams.append("movieId", movieId);
+        if (date !== 'none') queryParams.append("date", date);
+        if (city !== 'none') queryParams.append("city", city);
+        console.log(queryParams.toString());
+        fetch(`/api/showtime?${queryParams.toString()}`)
+            .then(response => response.json())
+            .then(data => renderShowtime(data.data))
+            .catch(error => console.error("Error:", error));
+    }
+    function renderShowtime(data) {
+        const showtimeContainer = document.querySelector(".theater-section");
+        showtimeContainer.innerHTML = "";
+        console.log(data);
+        data.theaters.forEach(theater => {
+            const theaterDiv = document.createElement("div");
+            theaterDiv.classList.add("theater");
+
+            const header = document.createElement("div");
+            header.classList.add("theater-header");
+            header.innerHTML = `
+                    <div class="theater-logo"></div>
+                    <div class="theater-info">
+                        <h2>${theater.theaterName}</h2>
+                        <p>${theater.address}</p>
+                    </div>
+                `;
+            theaterDiv.appendChild(header);
+
+            const showtimesDiv = document.createElement("div");
+            showtimesDiv.classList.add("showtimes");
+            theater.showtimes.forEach(showtime => {
+                const showtimeDiv = document.createElement("div");
+                showtimeDiv.classList.add("showtime");
+                showtimeDiv.innerHTML = `<span class="time">${showtime.startTime}</span>`;
+                showtimesDiv.appendChild(showtimeDiv);
+            });
+            theaterDiv.appendChild(showtimesDiv);
+
+            showtimeContainer.appendChild(theaterDiv);
+        });
+    }
+</script>

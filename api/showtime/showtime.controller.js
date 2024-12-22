@@ -1,11 +1,14 @@
-const {getShowtimes} = require("./showtime.service");
+const { getShowtimes } = require('./showtime.service');
 
-exports.getShowtimesJson = async (req, res) => {
-    try {
-        const showtimeData = await getShowtimes();
-        res.json(showtimeData);
-    } catch (error) {
-        console.error("Error loading showtimes:", error);
-        res.status(500).send("Error loading showtimes.");
+exports.getShowtimesJson = async (req, res, next) => {
+    const { movieId, date, city } = req.query;
+    if (!movieId) {
+        return res.status(400).json({ success: false, message: 'movieId is required' });
     }
-}
+    try {
+        const showtimeData = await getShowtimes(movieId, date, city);
+        res.json({ success: true, data: showtimeData });
+    } catch (error) {
+        next(error); // Forward to centralized error handler
+    }
+};

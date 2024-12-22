@@ -24,7 +24,6 @@ const PORT = 3000;
 
 // Serve static files
 app.use(express.static(path.join(__dirname, "public")));
-
 // Handle register and login form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

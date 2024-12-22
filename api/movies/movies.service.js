@@ -1,4 +1,37 @@
 const Movie = require("./movies.model");
+const { getCachedData } = require('../../config/redisConnection'); // Import getCachedData
+
+async function fetchFilterData() {
+    const result = await Movie.aggregate([
+        // Unwind the array field
+        { $unwind: "$type_name_vn" },
+        {
+            $group: {
+                _id: null, // Group all documents
+                distinctGenres: { $addToSet: "$type_name_vn" }, // Collect unique values from the array
+                distinctCountries: { $addToSet: "$country_name_vn" }, // Collect unique strings
+                distinctAges: { $addToSet: "$limitage_vn" } // Collect unique strings
+            }
+        },
+        { $project: { _id: 0 } } // Remove the _id field from the result
+    ]);
+
+    // Handle empty result
+    if (result.length === 0) {
+        return {
+            distinctGenres: [],
+            distinctCountries: [],
+            distinctAges: []
+        };
+    }
+
+    // Sort the arrays
+    result[0].distinctGenres.sort();
+    result[0].distinctCountries.sort();
+    result[0].distinctAges.sort();
+
+    return result[0];
+}
 
 async function getMovieListsByType(movieType, queryParam, page = 1, limit = 8) {
     try {
@@ -25,7 +58,7 @@ async function getMovieListsByType(movieType, queryParam, page = 1, limit = 8) {
         const movies = await Movie.find({ ...filter, ...query }).skip((page - 1) * limit).limit(limit).lean();
         const totalMovies = await Movie.countDocuments({ ...filter, ...query });
         const totalPages = Math.ceil(totalMovies / limit);
-
+        console.time('Filter'); // Start timing
         const result = await Movie.aggregate([
             // Unwind the array field
             { $unwind: "$type_name_vn" },
@@ -40,13 +73,24 @@ async function getMovieListsByType(movieType, queryParam, page = 1, limit = 8) {
             { $project: { _id: 0 } } // Remove the _id field from the result
         ]);
 
-        // Sort the distinct values
+        // Handle empty result
+        if (result.length === 0) {
+            return {
+                distinctGenres: [],
+                distinctCountries: [],
+                distinctAges: []
+            };
+        }
+
+        // Sort the arrays
         result[0].distinctGenres.sort();
         result[0].distinctCountries.sort();
         result[0].distinctAges.sort();
-
-
-        // console.log(result);
+        console.timeEnd('Filter'); // Logs the time taken
+        // Fetch filter data with caching
+        // console.time('Redis Filter'); // Start timing
+        // const filterData = await getCachedData('filterData', fetchFilterData);
+        // console.timeEnd('Redis Filter'); // Logs the time taken
         return {
             movies,
             genres: result[0].distinctGenres,
@@ -58,7 +102,7 @@ async function getMovieListsByType(movieType, queryParam, page = 1, limit = 8) {
         };
     } catch (err) {
         console.error("Error fetching movies:", err);
-        return { movies: [], genres: [], ages: [], ratings: [], countries: [], totalPages: 0, currentPage: page, ...movieStates };
+        return { movies: [], genres: [], ages: [], countries: [], totalPages: 0, currentPage: page, ...movieStates };
     }
 }
 
